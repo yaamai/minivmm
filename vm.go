@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"syscall"
 	"text/template"
 	"time"
 	"unicode"
@@ -52,6 +53,7 @@ type VMMetaData struct {
 	Status       string `json:"status"`
 	Owner        string `json:"owner"`
 	Image        string `json:"image"`
+	Arch         string `json:"arch"`
 	Volume       string `json:"volume"`
 	MacAddress   string `json:"mac_address"`
 	IPAddress    string `json:"ip_address"`
@@ -126,13 +128,17 @@ func convertSIPrefixedMemorySize(prefixedValue string) (string, error) {
 	return "", errors.New("Not supported prefix")
 }
 
-func generateQemuParams(qmpSocketPath, driveFilePath, cloudInitISOPath, vmMACAddr, vmIFSetupScriptPath, vmIFName, cpu, memory string) []string {
+func generateQemuParams(qmpSocketPath, driveFilePath, machineArch, cloudInitISOPath, vmMACAddr, vmIFSetupScriptPath, vmIFName, cpu, memory string) []string {
 	params := make([]string, 0, 32)
 
 	envNoKvm := os.Getenv(EnvNoKvm)
 	if !(envNoKvm == "1" || envNoKvm == "true") {
 		params = append(params, "--enable-kvm")
-	    params = append(params, "-cpu", "host")
+		params = append(params, "-cpu", "host")
+	}
+
+	if machineArch == "aarch64" {
+		params = append(params, "-machine", "virt")
 	}
 
 	params = append(params, "-drive", fmt.Sprintf("file=%s,if=virtio,cache=none,aio=threads,format=qcow2", driveFilePath))
@@ -332,10 +338,17 @@ func CreateVM(name, owner, imageName, cpu, memory, disk, userData, tag string) (
 	vmMACAddr := generateMACAddress()
 	password, _ := generateRandomPassword()
 
+	machineArch, err := getMachineArch()
+	if err != nil {
+		log.Println(err)
+		machineArch = "x86_64"
+	}
+
 	metaData := &VMMetaData{
 		Name:         name,
 		Owner:        owner,
 		Image:        imageName,
+		Arch:         machineArch,
 		Volume:       driveFilePath,
 		MacAddress:   vmMACAddr,
 		CPU:          cpu,
@@ -400,6 +413,7 @@ func prepareStartVM(name string, metaData *VMMetaData) ([]string, error) {
 	vmIFSetupScriptPath := filepath.Join("/tmp", "ifup")
 	vmIFCleanupScriptPath := filepath.Join("/tmp", "ifdown")
 	driveFilePath := metaData.Volume
+	machineArch := metaData.Arch
 	cloudInitISOPath := metaData.CloudInitIso
 	vmMACAddr := metaData.MacAddress
 	cpu := metaData.CPU
@@ -409,7 +423,7 @@ func prepareStartVM(name string, metaData *VMMetaData) ([]string, error) {
 	}
 	vmIFName := fmt.Sprintf("tap-%s", name)
 	prepareVMIF(vmIFName)
-	qemuParams := generateQemuParams(qmpSocketPath, driveFilePath, cloudInitISOPath, vmMACAddr, vmIFSetupScriptPath, vmIFName, cpu, memory)
+	qemuParams := generateQemuParams(qmpSocketPath, driveFilePath, machineArch, cloudInitISOPath, vmMACAddr, vmIFSetupScriptPath, vmIFName, cpu, memory)
 
 	log.Println("Prepare if script ...")
 	err = generateVMIFSetupScript(vmIFSetupScriptPath)
@@ -425,6 +439,24 @@ func prepareStartVM(name string, metaData *VMMetaData) ([]string, error) {
 	return qemuParams, nil
 }
 
+func getMachineArch() (string, error) {
+	u := syscall.Utsname{}
+	err := syscall.Uname(&u)
+	if err != nil {
+		return "", err
+	}
+
+	var m string
+	for _, val := range u.Machine {
+		if int(val) == 0 {
+			continue
+		}
+		m += string(int(val))
+	}
+
+	return m, nil
+}
+
 // StartVM starts VM.
 func StartVM(name string) (*VMMetaData, error) {
 	metaData, err := loadVMMetaData(name)
@@ -437,8 +469,9 @@ func StartVM(name string) (*VMMetaData, error) {
 		return nil, errors.New("Cannot start non-stopped VM")
 	}
 
+	qemuBinaryName := "qemu-system-" + metaData.Arch
 	qemuParams, err := prepareStartVM(name, metaData)
-	stdErr, err := qemu.LaunchCustomQemu(context.Background(), "", qemuParams, nil, nil, nil)
+	stdErr, err := qemu.LaunchCustomQemu(context.Background(), qemuBinaryName, qemuParams, nil, nil, nil)
 	if err != nil {
 		log.Println(stdErr)
 		return nil, errors.Wrap(err, "StartVM: VM launch failed")
