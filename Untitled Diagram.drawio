@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2020-08-02T11:28:18.110Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36" etag="rd8xBxm2kDPPo-nDE44o" version="13.5.8" type="github">
+<mxfile host="app.diagrams.net" modified="2020-08-02T11:41:53.433Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36" etag="Eaa05KQdW9tFlIhijU96" version="13.5.8" type="github">
   <diagram id="mbYCZxCBm6d6YpPdQ-Ii" name="Page-1">
     <mxGraphModel dx="1334" dy="749" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
@@ -34,8 +34,8 @@
         <mxCell id="N9PA9RaDS0fusDq-ocFW-10" value="Browser" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="180" y="280" width="50" height="150" as="geometry" />
         </mxCell>
-        <mxCell id="N9PA9RaDS0fusDq-ocFW-11" value="ExternalEndpoint: http://server-a" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;spacing=9;" vertex="1" parent="1">
-          <mxGeometry x="50" y="220" width="190" height="20" as="geometry" />
+        <mxCell id="N9PA9RaDS0fusDq-ocFW-11" value="ExternalEndpoint(==Origin): http://server-a" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;spacing=9;" vertex="1" parent="1">
+          <mxGeometry x="20" y="220" width="250" height="20" as="geometry" />
         </mxCell>
         <mxCell id="N9PA9RaDS0fusDq-ocFW-12" value="" style="endArrow=none;html=1;" edge="1" parent="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
@@ -107,8 +107,8 @@
             <mxPoint x="230" y="360" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="N9PA9RaDS0fusDq-ocFW-28" value="InternalEndpoint: http://server-a.internal&lt;br&gt;InternalAddress: 192.168.100.1/24" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;spacing=9;" vertex="1" parent="1">
-          <mxGeometry x="310" y="220" width="230" height="20" as="geometry" />
+        <mxCell id="N9PA9RaDS0fusDq-ocFW-28" value="Origin: http://server-a&lt;br&gt;Agents: http://server-a,http://server-b" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;spacing=9;" vertex="1" parent="1">
+          <mxGeometry x="310" y="130" width="230" height="30" as="geometry" />
         </mxCell>
         <mxCell id="N9PA9RaDS0fusDq-ocFW-29" value="" style="curved=1;endArrow=classic;html=1;strokeColor=#000000;" edge="1" parent="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
@@ -163,6 +163,30 @@
               <mxPoint x="690" y="290" />
             </Array>
           </mxGeometry>
+        </mxCell>
+        <mxCell id="N9PA9RaDS0fusDq-ocFW-47" value="Route: 172.16.1.0/24(Cidr-a) via (InternalAddress-a)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;spacing=9;fontColor=#FF3333;" vertex="1" parent="1">
+          <mxGeometry x="400" y="440" width="310" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="N9PA9RaDS0fusDq-ocFW-48" value="Route: 172.16.2.0/24(Cidr-b) via (InternalAddress-b)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;spacing=9;fontColor=#FF3333;" vertex="1" parent="1">
+          <mxGeometry x="400" y="280" width="310" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="N9PA9RaDS0fusDq-ocFW-49" value="Route Manipulator" style="rounded=0;whiteSpace=wrap;html=1;fontColor=#FF3333;" vertex="1" parent="1">
+          <mxGeometry x="180" y="520" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="N9PA9RaDS0fusDq-ocFW-50" value="" style="endArrow=classic;html=1;entryX=-0.01;entryY=0.797;entryDx=0;entryDy=0;entryPerimeter=0;fontColor=#FF3333;fillColor=#f8cecc;strokeColor=#FF3333;" edge="1" parent="1" target="N9PA9RaDS0fusDq-ocFW-1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="270" y="520" as="sourcePoint" />
+            <mxPoint x="310" y="440" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="N9PA9RaDS0fusDq-ocFW-52" value="" style="endArrow=classic;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.667;entryDx=0;entryDy=0;entryPerimeter=0;fontColor=#FF3333;fillColor=#f8cecc;strokeColor=#FF3333;" edge="1" parent="1" source="N9PA9RaDS0fusDq-ocFW-49" target="N9PA9RaDS0fusDq-ocFW-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="246.99999999999994" y="520.24" as="sourcePoint" />
+            <mxPoint x="422.99999999999994" y="358.26000000000016" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="N9PA9RaDS0fusDq-ocFW-54" value="Origin: http://server-a&lt;br&gt;&lt;font color=&quot;#ff3333&quot;&gt;InternalAddress: 192.168.100.1&lt;br&gt;&lt;/font&gt;Agents: http://server-a,http://server-b" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;spacing=9;" vertex="1" parent="1">
+          <mxGeometry x="310" y="190" width="230" height="50" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
